@@ -51,6 +51,7 @@ export async function carregarNavbar() {
     
     const salvar_disc = document.getElementById('salvar-disciplinas');
     salvar_disc.addEventListener('click', () => {
+        const paginaAtual = window.location.pathname.split('/').pop() || '';
         const selecionados = salvarCheckboxes();
         sessionStorage.setItem('disciplinasSelecionadas', JSON.stringify(selecionados));
         sessionStorage.setItem('entrada', '1');
