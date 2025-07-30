@@ -128,7 +128,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
         .catch(err => {
             console.error(err);
             telaCarregamento('desativar');        
-            alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
+            // alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
             sortearQuestao();
         });
         document.getElementById('dropMenuConfig').classList.contains('hidden') ? null : document.getElementById('dropMenuConfig').classList.add('hidden');
