@@ -26,11 +26,17 @@ export function pesquisaQuestao() {
             if (questoesComErro[i].ano === ano_pes && questoesComErro[i].questaoId === questaoId) {
                 alerta('Alerta', 'Pesquisar', 'Você encontrou uma questão com Erro! Tente pesquisar por uma outra questão, essa questão está com algum erro no nosso banco de dados! Sortearemos uma nova questão!', 'yellow');
                 console.error();
+                sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, erro: true }));
                 sortearQuestao();
                 return ;
             }
         }
-        sortearQuestao(ano_pes, questaoId, false);
+        if (window.location.pathname.includes('historico.html')) {
+            sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, erro: false }));
+            window.location.href = 'index.html';
+        } else {
+            sortearQuestao(ano_pes, questaoId, false);
+        }
     } else {
         alerta('Alerta', 'Pesquisar', 'Você tentou pesquisar uma questão inexistente! Tente pesquisar por uma questão válida! Sortearemos uma questão novamente!', 'yellow');
         console.error();
@@ -65,9 +71,24 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
         let apiUrl;
         const disc_selecionadas = JSON.parse(sessionStorage.getItem('disciplinasSelecionadas')) || [];
         
-        if (sorteada === true) {
-            ano = anoQ != 0 ? anoQ : Math.floor(Math.random() * (2022 - 2009 + 1)) + 2010;
-            questaoId = QId != 0 ? QId : Math.floor(Math.random() * 180) + 1;
+        const pesquisaSalvaString = sessionStorage.getItem('pesquisaQuestao');
+        if (pesquisaSalvaString) {
+            const pesquisaSalva = JSON.parse(pesquisaSalvaString);
+            ano = pesquisaSalva.ano;
+            questaoId = pesquisaSalva.questao;
+            sorteada = false;
+
+            sessionStorage.removeItem('pesquisaQuestao');
+
+            if (pesquisaSalva.erro === true) {
+                alerta('Alerta', 'Pesquisar', 'Você encontrou uma questão com Erro! Tente pesquisar por uma outra questão, essa questão está com algum erro no nosso banco de dados! Sortearemos uma nova questão!', 'yellow');
+                await new Promise(resolve => setTimeout(resolve, 700));
+                sortearQuestao();
+                return;
+            }
+        } else if (sorteada === true) {
+            ano = anoQ !== 0 ? anoQ : Math.floor(Math.random() * (2022 - 2009 + 1)) + 2010;
+            questaoId = QId !== 0 ? QId : Math.floor(Math.random() * 180) + 1;
         } else {
             ano = anoQ;
             questaoId = QId;
@@ -97,7 +118,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
         fetch(apiUrl)
         .then(response => response.json())
         .then(async data => {
-            if (verificarQuestaoSeUsada(data.title)) {
+            if (verificarQuestaoSeUsada(data.title) && sorteada === true) {
                 await new Promise(resolve => setTimeout(resolve, 700));
                 sortearQuestao();
                 return;
@@ -128,7 +149,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
         .catch(err => {
             console.error(err);
             telaCarregamento('desativar');        
-            // alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
+            alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
             sortearQuestao();
         });
         document.getElementById('dropMenuConfig').classList.contains('hidden') ? null : document.getElementById('dropMenuConfig').classList.add('hidden');

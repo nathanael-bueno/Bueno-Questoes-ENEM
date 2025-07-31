@@ -3,18 +3,20 @@ export function recolocar(valor, ano = 0, questaoId = 0) {
 }
 
 export function ativ_dest_Botao(botao, estado, cor_ativo) {
-    try {
-        botao.disabled = !estado;
-        if (!estado) {
-            botao.classList.add('cursor-not-allowed', 'bg-gray-500', 'text-white/75');
-            botao.classList.remove('cursor-pointer', `${cor_ativo}-600`, 'text-white', `hover:${cor_ativo}-400'`);
-        } else {
-            botao.classList.remove('cursor-not-allowed', 'bg-gray-500', 'text-white/75');
-            botao.classList.add('cursor-pointer', `${cor_ativo}-600`, 'text-white', `hover:${cor_ativo}-400'`);
+    if (botao) {
+        try {
+            botao.disabled = !estado;
+            if (!estado) {
+                botao.classList.add('cursor-not-allowed', 'bg-gray-500', 'text-white/75');
+                botao.classList.remove('cursor-pointer', `${cor_ativo}-600`, 'text-white', `hover:${cor_ativo}-400'`);
+            } else {
+                botao.classList.remove('cursor-not-allowed', 'bg-gray-500', 'text-white/75');
+                botao.classList.add('cursor-pointer', `${cor_ativo}-600`, 'text-white', `hover:${cor_ativo}-400'`);
+            }
+        } catch (error) {
+            console.error(error);
+            alerta('Erro', 'Erro ao ativar/desativar botão', `Não foi possível alterar o estado do botão. Tente novamente mais tarde.<br>${String(error)}`, 'red');
         }
-    } catch (error) {
-        console.error(error);
-        alerta('Erro', 'Erro ao ativar/desativar botão', `Não foi possível alterar o estado do botão. Tente novamente mais tarde.<br>${String(error)}`, 'red');
     }
 }
 
@@ -83,4 +85,3 @@ export async function telaCarregamento(estado = 'ativar', tempo = 0) {
         loading.classList.add('hidden');
     }
 }
-
