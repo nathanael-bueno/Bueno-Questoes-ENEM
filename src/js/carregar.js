@@ -55,7 +55,7 @@ export async function carregarNavbar() {
         const selecionados = salvarCheckboxes();
         sessionStorage.setItem('disciplinasSelecionadas', JSON.stringify(selecionados));
         sessionStorage.setItem('entrada', '1');
-        if (paginaAtual === 'index.html') {
+        if (paginaAtual === 'index.html' || window.location === "https://nathanael-bueno.github.io/Bueno-Questoes-ENEM/") {
             sortearQuestao();
         }
     });
