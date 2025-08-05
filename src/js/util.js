@@ -1,5 +1,5 @@
-export function recolocar(valor, ano = 0, questaoId = 0) {
-    return String(valor).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/\_(.*?)\_/g, '<u>$1</u>').replace(/!\[\]\((.*?)\)/g, `<img class="max-w-[50vw]" src="https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(questaoId)}/$1" alt="Imagem">`).replace(/\\\[…\\\]/g, '<span class="text-gray-700">[...]</span>').replace(/\#\#\#\#\#(.*?)<br>/g, '<h3 class="text-lg">$1</h3>').replace(/\[(.*?)\]/g, "[$1]");
+export function recolocar(valor, ano = 0, questaoId = 0, disciplina = '') {
+    return String(valor).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>').replace(/\_(.*?)\_/g, '<u>$1</u>').replace(/!\[\]\((.*?)\)/g, `<img class="max-w-[50vw]" src="https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(questaoId)}${(disciplina == 'espanhol' || disciplina == 'ingles') ? `-${disciplina}` : ''}/$1" alt="Imagem">`).replace(/\\\[…\\\]/g, '<span class="text-gray-700">[...]</span>').replace(/\#\#\#\#\#(.*?)<br>/g, '<h3 class="text-lg">$1</h3>').replace(/\[(.*?)\]/g, "[$1]");
 }
 
 export function ativ_dest_Botao(botao, estado, cor_ativo) {

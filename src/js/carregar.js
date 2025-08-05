@@ -51,12 +51,13 @@ export async function carregarNavbar() {
     
     const salvar_disc = document.getElementById('salvar-disciplinas');
     salvar_disc.addEventListener('click', () => {
-        const paginaAtual = window.location.pathname.split('/').pop() || '';
         const selecionados = salvarCheckboxes();
         sessionStorage.setItem('disciplinasSelecionadas', JSON.stringify(selecionados));
         sessionStorage.setItem('entrada', '1');
-        if (paginaAtual === 'index.html' || window.location === "https://nathanael-bueno.github.io/Bueno-Questoes-ENEM/") {
+        try{
             sortearQuestao();
+        } catch (error) {
+            window.location.href = 'index.html';
         }
     });
     

@@ -45,7 +45,7 @@ export function pesquisaQuestao() {
     }
 }
 
-export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
+export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguagem = null) {
     const main = document.getElementById('main');
     const questao = document.getElementById('questao');
     const texto = document.getElementById('texto');
@@ -53,6 +53,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
     const alternativas = document.getElementById('alternativas');
 
     const button_conferir = document.getElementById('conferir_resposta');
+    let lingua = linguagem || null;
     try {
         main.classList.add('hidden');
         ativ_dest_Botao(button_conferir, false, 'bg-green');
@@ -123,9 +124,10 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
                 sortearQuestao();
                 return;
             }
+            lingua = data.language;
             respostaCorreta = data.correctAlternative;
             questao.innerHTML = (data.title == null) ? '' : recolocar(data.title);
-            texto.innerHTML = (data.context == null) ? '' : recolocar(data.context, ano, data.index);
+            texto.innerHTML = (data.context == null) ? '' : recolocar(data.context, ano, data.index, data.language);
             pergunta.innerHTML = (data.alternativesIntroduction == null) ? '' : recolocar(data.alternativesIntroduction, ano, questaoId);
 
             for (let i = 0; i < data.alternatives.length; i++) {
@@ -148,9 +150,12 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true) {
         })
         .catch(err => {
             console.error(err);
-            telaCarregamento('desativar');        
-            alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
-            sortearQuestao();
+            telaCarregamento('desativar');
+            try {
+                sortearQuestao(ano, `${questaoId}-${lingua}`, false);
+            } catch (error) {
+                alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
+            }
         });
         document.getElementById('dropMenuConfig').classList.contains('hidden') ? null : document.getElementById('dropMenuConfig').classList.add('hidden');
     } catch (error) {
