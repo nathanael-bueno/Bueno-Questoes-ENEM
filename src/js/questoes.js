@@ -26,16 +26,16 @@ export function pesquisaQuestao() {
             if (questoesComErro[i].ano === ano_pes && questoesComErro[i].questaoId === questaoId) {
                 alerta('Alerta', 'Pesquisar', 'Você encontrou uma questão com Erro! Tente pesquisar por uma outra questão, essa questão está com algum erro no nosso banco de dados! Sortearemos uma nova questão!', 'yellow');
                 console.error();
-                sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, erro: true }));
+                sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, lingua:'ingles', erro: true }));
                 sortearQuestao();
                 return ;
             }
         }
         if (window.location.pathname.includes('historico.html')) {
-            sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, erro: false }));
+            sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, lingua: 'ingles', erro: false }));
             window.location.href = 'index.html';
         } else {
-            sortearQuestao(ano_pes, questaoId, false);
+            sortearQuestao(ano_pes, questaoId, false, 'ingles');
         }
     } else {
         alerta('Alerta', 'Pesquisar', 'Você tentou pesquisar uma questão inexistente! Tente pesquisar por uma questão válida! Sortearemos uma questão novamente!', 'yellow');
@@ -77,6 +77,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguag
             const pesquisaSalva = JSON.parse(pesquisaSalvaString);
             ano = pesquisaSalva.ano;
             questaoId = pesquisaSalva.questao;
+            lingua = pesquisaSalva.lingua;
             sorteada = false;
 
             sessionStorage.removeItem('pesquisaQuestao');
@@ -112,7 +113,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguag
             questaoId = QId != 0 ? QId : Math.floor(Math.random() * total_de_questoes) + 1;
             apiUrl = `https://bueno-api-enem.vercel.app/${disciplina}/${String(ano)}/questions/${String(questaoId)}/details.json`;
         } else {
-            apiUrl = `https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(questaoId)}/details.json`;
+            apiUrl = `https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(questaoId)}${(lingua != null) ? `-${lingua}` : ''}/details.json`;
         }
 
         
@@ -132,7 +133,7 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguag
 
             for (let i = 0; i < data.alternatives.length; i++) {
                 if (data.alternatives[i].text === null){
-                    alternativas.innerHTML += `<label class="transition-all duration-150 w-full flex items-top mb-[1.5rem] gap-2 cursor-pointer"><input type="radio" name="resposta" value="${String(data.alternatives[i].letter)}"> ${String(data.alternatives[i].letter)}) <img class="max-w-[50vw]" src="https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(data.index)}/${recolocar(data.alternatives[i].file)}"></label>`;
+                    alternativas.innerHTML += `<label class="transition-all duration-150 w-full flex items-top mb-[1.5rem] gap-2 cursor-pointer"><input type="radio" name="resposta" value="${String(data.alternatives[i].letter)}"> ${String(data.alternatives[i].letter)}) <img class="max-w-[50vw]" src="https://bueno-api-enem.vercel.app/${String(ano)}/questions/${String(data.index)}${(lingua != null) ? `-${lingua}` : ''}/${recolocar(data.alternatives[i].file)}"></label>`;
                 } else {
                     alternativas.innerHTML += `<label class="transition-all duration-150 cursor-pointer"><input type="radio" name="resposta" value="${String(data.alternatives[i].letter)}"> ${String(data.alternatives[i].letter)}) ${recolocar(data.alternatives[i].text)}</label>`;
                 }
@@ -152,8 +153,8 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguag
             console.error(err);
             telaCarregamento('desativar');
             try {
-                sortearQuestao(ano, `${questaoId}-${lingua}`, false);
-            } catch (error) {
+                sortearQuestao(ano, questaoId, false, 'espanhol');
+            } catch (erro) {
                 alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
             }
         });
