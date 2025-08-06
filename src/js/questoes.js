@@ -21,7 +21,7 @@ export function pesquisaQuestao() {
     const questaoId = Number(document.getElementById('questao-pesquisa').value);
     document.getElementById('ano-pesquisa').value = '';
     document.getElementById('questao-pesquisa').value = '';
-    if ((ano_pes >= 2009 && ano_pes <= 2023) || (questaoId >= 0 && questaoId <= 180)) {
+    if ((ano_pes >= 2009 && ano_pes <= 2023) && (questaoId >= 0 && questaoId <= 180)) {
         for (let i = 0; i < questoesComErro.length; i++) {
             if (questoesComErro[i].ano === ano_pes && questoesComErro[i].questaoId === questaoId) {
                 alerta('Alerta', 'Pesquisar', 'Você encontrou uma questão com Erro! Tente pesquisar por uma outra questão, essa questão está com algum erro no nosso banco de dados! Sortearemos uma nova questão!', 'yellow');
@@ -35,7 +35,7 @@ export function pesquisaQuestao() {
             sessionStorage.setItem('pesquisaQuestao', JSON.stringify({ ano: ano_pes, questao: questaoId, lingua: 'ingles', erro: false }));
             window.location.href = 'index.html';
         } else {
-            sortearQuestao(ano_pes, questaoId, false, 'ingles');
+            sortearQuestao(ano_pes, questaoId, false);
         }
     } else {
         alerta('Alerta', 'Pesquisar', 'Você tentou pesquisar uma questão inexistente! Tente pesquisar por uma questão válida! Sortearemos uma questão novamente!', 'yellow');
@@ -152,10 +152,16 @@ export async function sortearQuestao(anoQ = 0, QId = 0, sorteada = true, linguag
         .catch(err => {
             console.error(err);
             telaCarregamento('desativar');
-            try {
-                sortearQuestao(ano, questaoId, false, 'espanhol');
-            } catch (erro) {
+            console.error();
+            sessionStorage.setItem('erroSortearQ', (sessionStorage.getItem('erroSortearQ') ? Number(sessionStorage.getItem('erroSortearQ')) + 1 : 0));
+            if (sessionStorage.getItem('erroSortearQ') && sessionStorage.getItem('erroSortearQ') >= 2) {
                 alerta('Erro', 'Erro ao carregar a questão', `Não foi possível carregar a questão. Tente novamente mais tarde.<br>${String(err)}`, 'red');
+                sessionStorage.removeItem('erroSortearQ')
+                sortearQuestao();
+            } else if (sessionStorage.getItem('erroSortearQ') && sessionStorage.getItem('erroSortearQ') == 1) {
+                sortearQuestao(ano, questaoId, false, 'espanhol');
+            } else {
+                sortearQuestao(ano, questaoId, false, 'ingles');
             }
         });
         document.getElementById('dropMenuConfig').classList.contains('hidden') ? null : document.getElementById('dropMenuConfig').classList.add('hidden');
